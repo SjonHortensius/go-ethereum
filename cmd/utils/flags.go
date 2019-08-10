@@ -1069,6 +1069,12 @@ func MakePasswordList(ctx *cli.Context) []string {
 	if err != nil {
 		Fatalf("Failed to read password file: %v", err)
 	}
+
+	// Detect possible UTF16 little-endian BOM - added by default by MS PowerShell
+	if text[0] == 0xFF && text[1] == 0xFE {
+		Fatalf("Detected UTF-16 BOM in password file, please sanitize it")
+	}
+
 	lines := strings.Split(string(text), "\n")
 	// Sanitise DOS line endings.
 	for i := range lines {
